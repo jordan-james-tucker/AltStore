@@ -23,7 +23,28 @@ public extension UserDefaults
     @NSManaged var requiresAppGroupMigration: Bool
     
     @NSManaged var preferredServerID: String?
-    @NSManaged var deviceID: String?
+    @nonobjc var deviceID: String? {
+        get {
+            if let deviceID = self._deviceID, !deviceID.isEmpty
+            {
+                return deviceID
+            }
+
+            #if !NOTARIZED
+            // Classic installations embed the UDID at signing time. Background
+            // refresh must not depend solely on the mutable defaults cache.
+            if let deviceID = Bundle.main.object(forInfoDictionaryKey: Bundle.Info.deviceID) as? String,
+               !deviceID.isEmpty
+            {
+                return deviceID
+            }
+            #endif
+
+            return nil
+        }
+        set { self._deviceID = newValue }
+    }
+    @NSManaged @objc(deviceID) private var _deviceID: String?
     
     @NSManaged var isBackgroundRefreshEnabled: Bool
     @NSManaged var isDebugModeEnabled: Bool
