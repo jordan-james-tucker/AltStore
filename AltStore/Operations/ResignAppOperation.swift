@@ -183,7 +183,7 @@ private extension ResignAppOperation
 
                 if app.isAltStoreApp
                 {
-                    guard let udid = UserDefaults.shared.deviceID else { throw OperationError.unknownUDID }
+                    guard let udid = UserDefaults.shared.deviceID else { throw OperationError.unknownUDID() }
                     additionalValues[Bundle.Info.deviceID] = udid
                     additionalValues[Bundle.Info.serverID] = UserDefaults.standard.preferredServerID
                     
