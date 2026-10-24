@@ -209,6 +209,8 @@ class AuthenticationOperation: ResultOperation<(ALTTeam, ALTCertificate, ALTAppl
     override func finish(_ result: Result<(ALTTeam, ALTCertificate, ALTAppleAPISession), Error>)
     {
         guard !self.isFinished else { return }
+        ALTAppleAPI.shared.anisetteDataRefreshHandler = nil
+        ALTAppleAPI.shared.anisetteDataResyncHandler = nil
         
         switch result
         {
@@ -386,30 +388,57 @@ private extension AuthenticationOperation
     {
         self.appleIDEmailAddress = appleID
         
-        // Apple can ask for the anisette data to be resynchronized partway through signing in (hsc 434),
-        // which only the anisette server that provisioned it can do.
-        ALTAppleAPI.shared.anisetteDataResyncHandler = { [weak self] (sim, completionHandler) in
-            guard let self else { return completionHandler(nil, OperationError.unknown()) }
-
-            let resyncOperation = FetchAnisetteDataOperation(context: self.context)
-            resyncOperation.resynchronizationData = sim
-            resyncOperation.resultHandler = { (result) in
-                switch result
-                {
-                case .failure(let error): completionHandler(nil, error)
-                case .success(let anisetteData): completionHandler(anisetteData, nil)
-                }
-            }
-
-            self.operationQueue.addOperation(resyncOperation)
-        }
-
         let fetchAnisetteDataOperation = FetchAnisetteDataOperation(context: self.context)
-        fetchAnisetteDataOperation.resultHandler = { (result) in
+        fetchAnisetteDataOperation.resultHandler = { [weak fetchAnisetteDataOperation] (result) in
+            guard let fetchAnisetteDataOperation else { return }
+            fetchAnisetteDataOperation.resultHandler = nil
             switch result
             {
             case .failure(let error): completionHandler(.failure(error))
             case .success(let anisetteData):
+                do { try fetchAnisetteDataOperation.pinAuthenticationIdentity(anisetteData) }
+                catch { return completionHandler(.failure(error)) }
+                // AltSign's v3 fix requires the User-Agent that belongs to the
+                // Anisette provider. These handlers also keep the one-time
+                // password fresh after 2FA and recover from hsc 434.
+                ALTAppleAPI.shared.anisetteDataRefreshHandler = { [weak self] completionHandler in
+                    guard self != nil else {
+                        completionHandler(nil, OperationError.cancelled)
+                        return
+                    }
+
+                    Task {
+                        do
+                        {
+                            let anisetteData = try await fetchAnisetteDataOperation.fetchAuthenticationAnisetteData()
+                            completionHandler(anisetteData, nil)
+                        }
+                        catch
+                        {
+                            completionHandler(nil, error)
+                        }
+                    }
+                }
+
+                ALTAppleAPI.shared.anisetteDataResyncHandler = { [weak self] sim, completionHandler in
+                    guard self != nil else {
+                        completionHandler(nil, OperationError.cancelled)
+                        return
+                    }
+
+                    Task {
+                        do
+                        {
+                            let anisetteData = try await fetchAnisetteDataOperation.fetchAuthenticationAnisetteData(resyncData: sim)
+                            completionHandler(anisetteData, nil)
+                        }
+                        catch
+                        {
+                            completionHandler(nil, error)
+                        }
+                    }
+                }
+
                 let verificationHandler: ((@escaping (String?) -> Void) -> Void)?
                 
                 if let presentingViewController = self.presentingViewController
@@ -659,7 +688,7 @@ private extension AuthenticationOperation
                 
                 while true
                 {
-                    guard let presentingViewController else { throw OperationError.unknownUDID }
+                    guard let presentingViewController else { throw OperationError.unknownUDID() }
                     
                     do
                     {
