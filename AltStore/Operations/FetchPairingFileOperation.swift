@@ -60,7 +60,7 @@ private extension FetchPairingFileOperation
     {
         guard let server = self.context.server else { throw OperationError.serverNotFound }
         guard server.connectionType == .wired else { throw OperationError.wiredConnectionRequired() }
-        guard let udid = UserDefaults.shared.deviceID else { throw OperationError.unknownUDID }
+        guard let udid = UserDefaults.shared.deviceID else { throw OperationError.unknownUDID() }
 
         return try await withCheckedThrowingContinuation { continuation in
             // Existing bug can call completion twice, so guard against the continuation assert.
