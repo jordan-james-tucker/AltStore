@@ -54,7 +54,7 @@ class RefreshAppOperation: ResultOperation<InstalledApp>, @unchecked Sendable
                 }
                 else if let server = self.context.server
                 {
-                    guard let udid = UserDefaults.shared.deviceID else { throw OperationError.unknownUDID }
+                    guard let udid = UserDefaults.shared.deviceID else { throw OperationError.unknownUDID() }
 
                     try await self.refreshViaServer(profiles: profiles, app: app, server: server, udid: udid)
                 }
