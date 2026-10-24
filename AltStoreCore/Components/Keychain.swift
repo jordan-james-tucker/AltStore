@@ -91,6 +91,12 @@ public class Keychain
     @KeychainItem(key: "anisetteProvisioningClientInfo", synchronizable: false)
     public var anisetteProvisioningClientInfo: String?
 
+    @KeychainItem(key: "anisetteADIPBServerURL", synchronizable: false)
+    public var anisetteADIPBServerURL: String?
+
+    @KeychainItem(key: "anisetteProvisioningUserAgent", synchronizable: false)
+    public var anisetteProvisioningUserAgent: String?
+
     @KeychainItem(key: "devicePairingFile", synchronizable: false)
     public var devicePairingFile: Data?
 
