@@ -19,6 +19,24 @@ class AnisetteServerManager
 {
     static let shared = AnisetteServerManager()
 
+    // Keep the reviewed Mac providers available alongside the official directory.
+    static let preferredServers = [
+        AnisetteServer(name: "SideStore (Mac ADI)", url: URL(string: "https://new.ani.sidestore.io")!),
+        AnisetteServer(name: "jkcoxson (Mac ADI)", url: URL(string: "https://mac-ani.jkcoxson.com")!),
+        AnisetteServer(name: "jkcoxson (Windows ADI)", url: URL(string: "https://ani.jkcoxson.com")!),
+        AnisetteServer(name: "StikStore (Windows ADI)", url: URL(string: "https://ani2.stikstore.app")!),
+    ]
+
+    static func prioritizedServers(_ servers: [AnisetteServer]) -> [AnisetteServer]
+    {
+        var seen = Set<URL>()
+        return (preferredServers + servers).filter { seen.insert($0.url).inserted }
+    }
+
+    var cachedServers: [AnisetteServer] {
+        Self.prioritizedServers(UserDefaults.shared.anisetteServers ?? [])
+    }
+
     private let session: URLSession
 
     private init()
@@ -44,9 +62,10 @@ class AnisetteServerManager
         let (data, _) = try await self.session.data(from: .anisetteServers)
         let response = try Foundation.JSONDecoder().decode(Response.self, from: data)
 
-        UserDefaults.shared.anisetteServers = response.servers
+        let servers = Self.prioritizedServers(response.servers)
+        UserDefaults.shared.anisetteServers = servers
 
-        return response.servers
+        return servers
     }
 
     // Verifies a URL points to a working anisette server.
