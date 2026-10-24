@@ -1,3 +1,8 @@
+> **Independent Classic fork (experimental).** Based on official Classic 2.3.1,
+> upstream `bbc10d6964185b75a46c6ddd7476ac08df095308` (the app version commit is
+> `44ce4a571d1d662da03329b060752279774517f7`). This is not an official AltStore release.
+> See [FORK.md](FORK.md) for changes, build instructions, provenance and limitations.
+
 # AltStore
 
 > AltStore is an alternative app store for non-jailbroken iOS devices. 
@@ -8,7 +13,7 @@
 
 AltStore is an iOS application that allows you to sideload other apps (.ipa files) onto your iOS device with just your Apple ID. AltStore resigns apps with your personal development certificate and sends them to a desktop app, AltServer, which installs the resigned apps back to your device using iTunes WiFi sync. To prevent apps from expiring, AltStore will also periodically refresh your apps in the background when on the same WiFi as AltServer.
 
-For the initial release, I focused on building a solid foundation for distributing my own apps — primarily Delta, [my all-in-one emulator for iOS](https://github.com/rileytestut/Delta). Now that Delta has been released, however, I'm beginning work on adding support for *anyone* to list and distribute their apps through AltStore (contributions welcome! 🙂).
+For the initial release, I focused on building a solid foundation for distributing my own apps â€” primarily Delta, [my all-in-one emulator for iOS](https://github.com/rileytestut/Delta). Now that Delta has been released, however, I'm beginning work on adding support for *anyone* to list and distribute their apps through AltStore (contributions welcome! ðŸ™‚).
 
 ## Features
 - Installs apps over WiFi using AltServer
@@ -59,7 +64,7 @@ AltStore and AltServer are both fairly straightforward to compile and run if you
 3. Open `AltStore.xcworkspace` and select the AltStore project in the project navigator. On the `Signing & Capabilities` tab, change the team from `Yvette Testut` to your own account.
 4. **(AltStore only)** Change the value for `ALTDeviceID` in the Info.plist to your device's UDID. Normally, AltServer embeds the device's UDID in AltStore's Info.plist during installation. When running through Xcode you'll need to set the value yourself or else AltStore won't resign (or even install) apps for the proper device.
 5. **(AltStore only)** Change the value for `ALTServerID` in the Info.plist to your AltServer's serverID. This is embedded by AltServer during installation to help AltStore distinguish between multiple AltServers on the same network, and you can find this by using a Bonjour browsing application and noting the serverID advertised by AltServer. This isn't strictly necessary, because if AltStore can't find the AltServer with the embedded serverID it still falls back to trying another AltServer. However, this will help in cases where there are multiple AltServers running (plus the error messages are more helpful).
-6. Build + run app! 🎉
+6. Build + run app! ðŸŽ‰
 
 ## Licensing
 
