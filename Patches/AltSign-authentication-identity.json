@@ -1,0 +1,7 @@
+{
+  "base_commit": "e639bdfbea185d5c229b11f62e25c5d78649d5c4",
+  "path": "AltSign/Sources/ALTAppleAPI+Authentication.swift",
+  "before_sha256": "d1497ba1b3a56bde5f10325a14aab15cffc76e3f72958813eec8a4f608e11e61",
+  "after_sha256": "36facfc78984cf0b40551092bd9173a0d83cf08682134eeb58ec4e9c283f1a6a",
+  "patch_sha256": "d936cddfd4be56a05905e75ed0acec42523cae8ea505669f62f01d1079f8d9d2"
+}
