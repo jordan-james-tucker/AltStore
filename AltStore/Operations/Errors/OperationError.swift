@@ -54,7 +54,9 @@ extension OperationError
     static let unknownResult: OperationError = .init(code: .unknownResult)
     static let timedOut: OperationError = .init(code: .timedOut)
     static let notAuthenticated: OperationError = .init(code: .notAuthenticated)
-    static let unknownUDID: OperationError = .init(code: .unknownUDID)
+    static func unknownUDID(file: String = #fileID, line: UInt = #line) -> OperationError {
+        OperationError(code: .unknownUDID, sourceFile: file, sourceLine: line)
+    }
     static let invalidApp: OperationError = .init(code: .invalidApp)
     static let noSources: OperationError = .init(code: .noSources)
     static let missingAppGroup: OperationError = .init(code: .missingAppGroup)
@@ -162,7 +164,13 @@ struct OperationError: ALTLocalizedError
         case .unknownResult: return NSLocalizedString("The operation returned an unknown result.", comment: "")
         case .timedOut: return NSLocalizedString("The operation timed out.", comment: "")
         case .notAuthenticated: return NSLocalizedString("You are not signed in.", comment: "")
-        case .unknownUDID: return NSLocalizedString("AltStore could not determine this device's UDID.", comment: "")
+        case .unknownUDID:
+            var failureReason = NSLocalizedString("AltStore could not determine this device's UDID.", comment: "")
+            if let sourceFile, let sourceLine
+            {
+                failureReason += " (\(sourceFile) line \(sourceLine))"
+            }
+            return failureReason
         case .invalidApp: return NSLocalizedString("The app is in an invalid format.", comment: "")
         case .invalidParameters: return NSLocalizedString("Invalid parameters.", comment: "")
         case .maximumAppIDLimitReached: return NSLocalizedString("You cannot register more than 10 App IDs within a 7 day period.", comment: "")
