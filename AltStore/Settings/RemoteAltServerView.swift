@@ -13,7 +13,7 @@ import AltStoreCore
 struct RemoteAltServerView: View
 {
     @State
-    private var availableServers: [AnisetteServer]? = UserDefaults.shared.anisetteServers
+    private var availableServers: [AnisetteServer]? = AnisetteServerManager.shared.cachedServers
     
     @State
     private var isLoading = true
@@ -193,6 +193,8 @@ private extension RemoteAltServerView
         Keychain.shared.anisetteADIPB = nil
         Keychain.shared.anisetteIdentityKey = nil
         Keychain.shared.anisetteProvisioningClientInfo = nil
+        Keychain.shared.anisetteADIPBServerURL = nil
+        Keychain.shared.anisetteProvisioningUserAgent = nil
         
         UserDefaults.shared.preferredAnisetteServerURL = url
         preferredURL = url
@@ -251,6 +253,8 @@ private extension RemoteAltServerView
         Keychain.shared.anisetteADIPB = nil
         Keychain.shared.anisetteIdentityKey = nil
         Keychain.shared.anisetteProvisioningClientInfo = nil
+        Keychain.shared.anisetteADIPBServerURL = nil
+        Keychain.shared.anisetteProvisioningUserAgent = nil
         
         dismiss() // Return to Settings
     }
