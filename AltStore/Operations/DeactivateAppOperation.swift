@@ -53,7 +53,7 @@ class DeactivateAppOperation: ResultOperation<InstalledApp>, @unchecked Sendable
                     }
                     else if let server = self.context.server
                     {
-                        guard let udid = UserDefaults.shared.deviceID else { throw OperationError.unknownUDID }
+                        guard let udid = UserDefaults.shared.deviceID else { throw OperationError.unknownUDID() }
 
                         try await self.deactivateViaServer(bundleIdentifiers: bundleIdentifiers, server: server, udid: udid)
                     }
