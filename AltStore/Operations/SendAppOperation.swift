@@ -78,7 +78,7 @@ private extension SendAppOperation
         do
         {
             guard let appData = try? Data(contentsOf: fileURL) else { throw OperationError.invalidApp }
-            guard let udid = UserDefaults.shared.deviceID else { throw OperationError.unknownUDID }
+            guard let udid = UserDefaults.shared.deviceID else { throw OperationError.unknownUDID() }
             
             var request = PrepareAppRequest(udid: udid, contentSize: appData.count)
             
